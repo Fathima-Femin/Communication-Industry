@@ -13,20 +13,22 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - run: npm install -g @salesforce/cli
+      - name: Install Salesforce CLI
+        run: npm install -g @salesforce/cli
 
-      - run: echo "${{ secrets.SF_SERVER_KEY }}" > server.key
+      - name: Create server key
+        run: echo "${{ secrets.SF_SERVER_KEY }}" > server.key
 
       - name: Login PROD
         run: |
           sf org login jwt \
-          --client-id ${{ secrets.SF_CLIENT_ID }} \
+          --client-id ${{ secrets.SF_PROD_CLIENT_ID }} \
           --jwt-key-file server.key \
           --username ${{ secrets.SF_PROD_USERNAME }} \
           --alias prod \
           --instance-url ${{ secrets.SF_INSTANCE_URL }}
 
-      - name: Deploy PROD
+      - name: Deploy to Production
         run: |
           sf project deploy start \
           --target-org prod \
