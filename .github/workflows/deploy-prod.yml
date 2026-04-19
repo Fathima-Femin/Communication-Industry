@@ -1,0 +1,33 @@
+name: Deploy Production
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - run: npm install -g @salesforce/cli
+
+      - run: echo "${{ secrets.SF_SERVER_KEY }}" > server.key
+
+      - name: Login PROD
+        run: |
+          sf org login jwt \
+          --client-id ${{ secrets.SF_CLIENT_ID }} \
+          --jwt-key-file server.key \
+          --username ${{ secrets.SF_PROD_USERNAME }} \
+          --alias prod \
+          --instance-url ${{ secrets.SF_INSTANCE_URL }}
+
+      - name: Deploy PROD
+        run: |
+          sf project deploy start \
+          --target-org prod \
+          --source-dir force-app
