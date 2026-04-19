@@ -1,0 +1,25 @@
+name: Static Code Scan
+
+on:
+  pull_request:
+    branches:
+      - dev
+      - uat
+      - main
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - run: npm install -g @salesforce/cli
+
+      - run: sf plugins install @salesforce/sfdx-scanner
+
+      - name: Run scanner
+        run: |
+          sf scanner run \
+          --target force-app \
+          --format table
