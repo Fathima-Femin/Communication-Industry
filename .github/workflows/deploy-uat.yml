@@ -13,20 +13,22 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - run: npm install -g @salesforce/cli
+      - name: Install Salesforce CLI
+        run: npm install -g @salesforce/cli
 
-      - run: echo "${{ secrets.SF_SERVER_KEY }}" > server.key
+      - name: Create server key
+        run: echo "${{ secrets.SF_SERVER_KEY }}" > server.key
 
       - name: Login UAT
         run: |
           sf org login jwt \
-          --client-id ${{ secrets.SF_CLIENT_ID }} \
+          --client-id ${{ secrets.SF_UAT_CLIENT_ID }} \
           --jwt-key-file server.key \
           --username ${{ secrets.SF_UAT_USERNAME }} \
           --alias uat \
           --instance-url ${{ secrets.SF_INSTANCE_URL }}
 
-      - name: Deploy UAT
+      - name: Deploy to UAT
         run: |
           sf project deploy start \
           --target-org uat \
