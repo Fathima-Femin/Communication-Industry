@@ -23,7 +23,7 @@ jobs:
       - name: Login DEV org
         run: |
           sf org login jwt \
-          --client-id ${{ secrets.SF_CLIENT_ID }} \
+          --client-id ${{ secrets.SF_DEV_CLIENT_ID }} \
           --jwt-key-file server.key \
           --username ${{ secrets.SF_DEV_USERNAME }} \
           --alias targetorg \
