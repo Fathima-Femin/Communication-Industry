@@ -14,15 +14,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - run: npm install -g @salesforce/cli
+      - name: Install Salesforce CLI
+        run: npm install -g @salesforce/cli
 
-      - run: echo "${{ secrets.SF_SERVER_KEY }}" > server.key
+      - name: Create server key
+        run: echo "${{ secrets.SF_SERVER_KEY }}" > server.key
 
       - name: Login DEV
         if: github.ref_name == 'dev'
         run: |
           sf org login jwt \
-          --client-id ${{ secrets.SF_CLIENT_ID }} \
+          --client-id ${{ secrets.SF_DEV_CLIENT_ID }} \
           --jwt-key-file server.key \
           --username ${{ secrets.SF_DEV_USERNAME }} \
           --alias targetorg \
@@ -32,7 +34,7 @@ jobs:
         if: github.ref_name == 'uat'
         run: |
           sf org login jwt \
-          --client-id ${{ secrets.SF_CLIENT_ID }} \
+          --client-id ${{ secrets.SF_UAT_CLIENT_ID }} \
           --jwt-key-file server.key \
           --username ${{ secrets.SF_UAT_USERNAME }} \
           --alias targetorg \
@@ -42,7 +44,7 @@ jobs:
         if: github.ref_name == 'main'
         run: |
           sf org login jwt \
-          --client-id ${{ secrets.SF_CLIENT_ID }} \
+          --client-id ${{ secrets.SF_PROD_CLIENT_ID }} \
           --jwt-key-file server.key \
           --username ${{ secrets.SF_PROD_USERNAME }} \
           --alias targetorg \
