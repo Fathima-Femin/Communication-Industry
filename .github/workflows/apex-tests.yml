@@ -1,0 +1,56 @@
+name: Apex Tests
+
+on:
+  push:
+    branches:
+      - dev
+      - uat
+      - main
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - run: npm install -g @salesforce/cli
+
+      - run: echo "${{ secrets.SF_SERVER_KEY }}" > server.key
+
+      - name: Login DEV
+        if: github.ref_name == 'dev'
+        run: |
+          sf org login jwt \
+          --client-id ${{ secrets.SF_CLIENT_ID }} \
+          --jwt-key-file server.key \
+          --username ${{ secrets.SF_DEV_USERNAME }} \
+          --alias targetorg \
+          --instance-url ${{ secrets.SF_INSTANCE_URL }}
+
+      - name: Login UAT
+        if: github.ref_name == 'uat'
+        run: |
+          sf org login jwt \
+          --client-id ${{ secrets.SF_CLIENT_ID }} \
+          --jwt-key-file server.key \
+          --username ${{ secrets.SF_UAT_USERNAME }} \
+          --alias targetorg \
+          --instance-url ${{ secrets.SF_INSTANCE_URL }}
+
+      - name: Login PROD
+        if: github.ref_name == 'main'
+        run: |
+          sf org login jwt \
+          --client-id ${{ secrets.SF_CLIENT_ID }} \
+          --jwt-key-file server.key \
+          --username ${{ secrets.SF_PROD_USERNAME }} \
+          --alias targetorg \
+          --instance-url ${{ secrets.SF_INSTANCE_URL }}
+
+      - name: Run Apex Tests
+        run: |
+          sf apex run test \
+          --target-org targetorg \
+          --code-coverage \
+          --result-format human
